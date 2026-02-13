@@ -28,6 +28,8 @@ public class EnemyAIController : EnemyController
 
     private int patrolDirection = 1;
     private float nextAttackTime;
+    private Facing2D facing;
+    private SpriteRenderer spriteRenderer;
 
     private EnemyPatrolState patrolState;
     private EnemyAlertState alertState;
@@ -36,7 +38,9 @@ public class EnemyAIController : EnemyController
     protected override void Awake()
     {
         base.Awake();
-        patrolDirection = transform.localScale.x < 0f ? -1 : 1;
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        facing = new Facing2D(transform, spriteRenderer);
+        patrolDirection = facing.FacingDirection;
 
         patrolState = new EnemyPatrolState(this, stateMachine);
         alertState = new EnemyAlertState(this, stateMachine);
@@ -200,10 +204,14 @@ public class EnemyAIController : EnemyController
 
     private void SetFacing(int direction)
     {
-        patrolDirection = direction >= 0 ? 1 : -1;
-        Vector3 currentScale = transform.localScale;
-        currentScale.x = Mathf.Abs(currentScale.x) * patrolDirection;
-        transform.localScale = currentScale;
+        if (facing == null)
+        {
+            patrolDirection = direction >= 0 ? 1 : -1;
+            return;
+        }
+
+        facing.SetFacing(direction);
+        patrolDirection = facing.FacingDirection;
     }
 
 }
