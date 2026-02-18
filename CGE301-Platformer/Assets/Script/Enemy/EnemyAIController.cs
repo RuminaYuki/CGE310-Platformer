@@ -36,6 +36,7 @@ public class EnemyAIController : EnemyController
     private EnemyPatrolState patrolState;
     private EnemyAlertState alertState;
     private EnemyAttackState attackState;
+    private EnemyStunState stunState;
 
     protected override void Awake()
     {
@@ -48,6 +49,7 @@ public class EnemyAIController : EnemyController
         patrolState = new EnemyPatrolState(this, stateMachine);
         alertState = new EnemyAlertState(this, stateMachine);
         attackState = new EnemyAttackState(this, stateMachine);
+        stunState = new EnemyStunState(this, stateMachine);
     }
 
     protected override void Start()
@@ -59,6 +61,8 @@ public class EnemyAIController : EnemyController
     public EnemyState PatrolState => patrolState;
     public EnemyState AlertState => alertState;
     public EnemyState AttackState => attackState;
+    public EnemyState StunState => stunState;
+    
     public float AlertDuration => alertDuration;
 
     public Transform Player

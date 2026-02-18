@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
@@ -13,6 +12,7 @@ public class PlayerController : MonoBehaviour
 
     InputAction move;
     InputAction jump;
+    InputAction dash;
     Vector2 moveDirection;
 
     [Header("Walk")]
@@ -21,6 +21,15 @@ public class PlayerController : MonoBehaviour
 
     [Header("Jump")]
     [SerializeField] float jumpForce = 8f;
+
+    [Header("Dash")]
+    [SerializeField] float dashSpeed = 12f;
+    [SerializeField] float dashDuration = 0.15f;
+    [SerializeField] float dashCooldown = 0.5f;
+    bool isDashing;
+    float dashTimer;
+    float nextDashTime;
+    int dashDirection = 1;
 
     [Header("Ground Check")]
     [SerializeField] GroundCheck groundCheck;
@@ -50,29 +59,46 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void OnEnable()
+    void OnEnable()
     {
         move = playerController.Player.Move;
         move.Enable();
 
         jump = playerController.Player.Jump;
         jump.Enable();
+
+        dash = playerController.Player.Dash;
+        dash.Enable();
     }
 
-    private void OnDisable()
+    void OnDisable()
     {
         move.Disable();
         jump.Disable();
+
+        dash.Disable();
     }
 
     void Update()
     {
         ReadInputForWalk();
         QueueJump();
+        QueueDash();
     }
 
     void FixedUpdate()
     {
+        if (isKnockback)
+        {
+            return;
+        }
+
+        if (isDashing)
+        {
+            ApplyDash();
+            return;
+        }
+
         Walk();
         ApplyJump();
     }
@@ -92,9 +118,35 @@ public class PlayerController : MonoBehaviour
         moveDirection = move.ReadValue<Vector2>();
     }
 
+    void QueueDash()
+    {
+        if (dash == null || !dash.WasPressedThisFrame())
+        {
+            return;
+        }
+
+        if (Time.time < nextDashTime)
+        {
+            return;
+        }
+
+        float inputX = moveDirection.x;
+        if (Mathf.Abs(inputX) > 0.01f)
+        {
+            dashDirection = inputX > 0f ? 1 : -1;
+        }
+        else
+        {
+            dashDirection = facing != null ? facing.FacingDirection : 1;
+        }
+
+        isDashing = true;
+        dashTimer = dashDuration;
+        nextDashTime = Time.time + dashCooldown;
+    }
+
     void Walk()
-    {   
-        //สลับฝั่ง
+    {
         float inputX = moveDirection.x;
         if (facing != null)
         {
@@ -102,23 +154,54 @@ public class PlayerController : MonoBehaviour
         }
 
         int facingDirection = facing != null ? facing.FacingDirection : 1;
+        bool isTouchingWall = IsTouchingWall(facingDirection);
+        if (isTouchingWall && Mathf.Abs(inputX) > 0.01f)
+        {
+            SetHorizontalVelocity(0f);
+            return;
+        }
+
+        SetHorizontalVelocity(inputX * moveSpeed);
+    }
+
+    void ApplyDash()
+    {
+        if (IsTouchingWall(dashDirection))
+        {
+            EndDash();
+            SetHorizontalVelocity(0f);
+            return;
+        }
+
+        SetHorizontalVelocity(dashDirection * dashSpeed);
+        dashTimer -= Time.fixedDeltaTime;
+
+        if (dashTimer <= 0f)
+        {
+            EndDash();
+        }
+    }
+
+    void EndDash()
+    {
+        isDashing = false;
+    }
+
+    bool IsTouchingWall(int facingDirection)
+    {
         Vector2 castDirection = Vector2.right * facingDirection;
-        // เช็กกำแพง
         origin = new Vector2(
             facingDirection > 0 ? col.bounds.max.x : col.bounds.min.x,
             col.bounds.center.y
         );
         size = new Vector2(0.001f, col.bounds.size.y - 0.1f);
 
-        bool isTouchingWall = Physics2D.BoxCast(origin, size, 0f, castDirection, distanceCheck, layer);
-        if (isTouchingWall && Mathf.Abs(inputX) > 0.01f)
-        {
-            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
-            return;
-        }
-        // เดินปกติ
-        if(isKnockback) return;
-        rb.linearVelocity = new Vector2(inputX * moveSpeed, rb.linearVelocity.y);
+        return Physics2D.BoxCast(origin, size, 0f, castDirection, distanceCheck, layer);
+    }
+
+    void SetHorizontalVelocity(float x)
+    {
+        rb.linearVelocity = new Vector2(x, rb.linearVelocity.y);
     }
 
     void ApplyJump()
