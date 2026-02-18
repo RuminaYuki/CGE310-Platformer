@@ -25,11 +25,13 @@ public class EnemyAIController : EnemyController
     [SerializeField] private Transform viewPoint;
     [SerializeField, Range(1f, 10f)] private float viewDistance = 4f;
     [SerializeField, Range(1f, 179f)] private float viewAngle = 60f;
+    [SerializeField] private LayerMask ignoreVisionLayers;
 
     private int patrolDirection = 1;
     private float nextAttackTime;
     private Facing2D facing;
     private SpriteRenderer spriteRenderer;
+    private Animator animator;
 
     private EnemyPatrolState patrolState;
     private EnemyAlertState alertState;
@@ -41,6 +43,7 @@ public class EnemyAIController : EnemyController
         spriteRenderer = GetComponent<SpriteRenderer>();
         facing = new Facing2D(transform, spriteRenderer);
         patrolDirection = facing.FacingDirection;
+        animator = GetComponent<Animator>();
 
         patrolState = new EnemyPatrolState(this, stateMachine);
         alertState = new EnemyAlertState(this, stateMachine);
@@ -123,7 +126,8 @@ public class EnemyAIController : EnemyController
             return false;
         }
 
-        RaycastHit2D hit = Physics2D.Raycast(origin, toPlayer.normalized, distanceToPlayer);
+        int visionMask = ~ignoreVisionLayers.value;
+        RaycastHit2D hit = Physics2D.Raycast(origin, toPlayer.normalized, distanceToPlayer, visionMask);
         return hit.collider != null && hit.collider.CompareTag("Player");
     }
 
@@ -159,20 +163,14 @@ public class EnemyAIController : EnemyController
         {
             return;
         }
-
         if (Time.time < nextAttackTime)
         {
-            Debug.Log(nextAttackTime);
             return;
         }
 
         nextAttackTime = Time.time + attackInterval;
-        Debug.Log("Attacked");
-    }
-
-    public void StartAttackCooldown()
-    {
-        nextAttackTime = Time.time + attackInterval;
+        animator.SetTrigger("Attack");
+        Debug.Log("Attacked Trigger");
     }
 
     public void StopMove()
@@ -215,3 +213,4 @@ public class EnemyAIController : EnemyController
     }
 
 }
+

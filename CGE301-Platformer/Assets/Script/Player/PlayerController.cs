@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Walk")]
     [SerializeField] float moveSpeed = 5f;
+    public bool isKnockback = false;
 
     [Header("Jump")]
     [SerializeField] float jumpForce = 8f;
@@ -26,11 +27,14 @@ public class PlayerController : MonoBehaviour
 
     [Header("Wall Check")]
     [SerializeField] float distanceCheck = 0.3f;
+    [SerializeField] LayerMask layer;
     bool isGrounded;
     bool jumpQueued;
 
     Vector2 origin;
     Vector2 size;
+
+    public Rigidbody2D Rb => rb;
 
     void Awake()
     {
@@ -106,13 +110,14 @@ public class PlayerController : MonoBehaviour
         );
         size = new Vector2(0.001f, col.bounds.size.y - 0.1f);
 
-        bool isTouchingWall = Physics2D.BoxCast(origin, size, 0f, castDirection, distanceCheck);
+        bool isTouchingWall = Physics2D.BoxCast(origin, size, 0f, castDirection, distanceCheck, layer);
         if (isTouchingWall && Mathf.Abs(inputX) > 0.01f)
         {
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             return;
         }
         // เดินปกติ
+        if(isKnockback) return;
         rb.linearVelocity = new Vector2(inputX * moveSpeed, rb.linearVelocity.y);
     }
 

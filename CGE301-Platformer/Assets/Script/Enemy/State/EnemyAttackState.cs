@@ -1,7 +1,7 @@
+using UnityEngine;
 public class EnemyAttackState : EnemyState
 {
     private EnemyAIController enemyAi;
-    private bool hasStartedAttackCycle;
 
     public EnemyAttackState(EnemyAIController enemy, EnemyStateMachine stateMachine)
         : base(enemy, stateMachine)
@@ -11,7 +11,7 @@ public class EnemyAttackState : EnemyState
 
     public override void Enter()
     {
-        hasStartedAttackCycle = false;
+        
     }
 
     public override void Tick()
@@ -25,13 +25,6 @@ public class EnemyAttackState : EnemyState
         if (enemyAi.IsPlayerInAttackRange())
         {
             enemyAi.StopMove();
-            if (!hasStartedAttackCycle)
-            {
-                enemyAi.StartAttackCooldown();
-                hasStartedAttackCycle = true;
-                return;
-            }
-
             enemyAi.TryAttackPlayer();
             return;
         }
