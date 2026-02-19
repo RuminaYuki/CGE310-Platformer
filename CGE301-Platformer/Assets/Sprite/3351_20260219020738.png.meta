@@ -376,7 +376,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: wing
+      name: 3351_20260219020738_9
       rect:
         serializedVersion: 2
         x: 883
@@ -485,6 +485,28 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: 3351_20260219020738_14
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 8
+        width: 1237
+        height: 1053
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3aa256f9dcb394640adeb0d9368e28f9
+      internalID: -1895741991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -511,9 +533,9 @@ TextureImporter:
       3351_20260219020738_5: 1916490518
       3351_20260219020738_6: -1188845649
       3351_20260219020738_7: -240881090
+      3351_20260219020738_9: 355428954
       Dash: 379644129
       DashShotGun: 653483331
-      wing: 355428954
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
