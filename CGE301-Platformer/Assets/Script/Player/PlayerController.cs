@@ -39,11 +39,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] LayerMask layer;
     bool isGrounded;
     bool jumpQueued;
+    bool jumpPressedThisFrame;
 
     Vector2 origin;
     Vector2 size;
 
     public Rigidbody2D Rb => rb;
+    public bool IsDashing => isDashing;
+    public bool IsGrounded => isGrounded;
+    public bool JumpPressedThisFrame => jumpPressedThisFrame;
 
     void Awake()
     {
@@ -81,6 +85,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        jumpPressedThisFrame = false;
         ReadInputForWalk();
         QueueJump();
         QueueDash();
@@ -109,6 +114,7 @@ public class PlayerController : MonoBehaviour
 
         if (jump.WasPressedThisFrame())
         {
+            jumpPressedThisFrame = true;
             jumpQueued = true;
         }
     }

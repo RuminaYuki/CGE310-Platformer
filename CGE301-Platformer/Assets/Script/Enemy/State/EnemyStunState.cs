@@ -19,7 +19,6 @@ public class EnemyStunState : EnemyState
     public override void Enter()
     {
         enemyAi.StopMove();
-        Debug.Log("Enter Stun State");
     }
 
     public override void Tick()

@@ -4,15 +4,23 @@ public class EnemyHitboxAttack : MonoBehaviour
 {
     [SerializeField] float KnockbackForce;
     [SerializeField] float KnockbackDuration = 1f;
-    void OnTriggerEnter2D(Collider2D collision)
+
+    private EnemyAIController enemyAIController;
+    private Transform enemyTransform;
+
+    void Awake()
     {
-        if(!collision.gameObject.CompareTag("Player")) return;
-        collision.gameObject.GetComponent<PlayerDamageHeadler>().KnockBackReceiver(KnockbackForce,KnockbackDuration,transform);
+        enemyAIController = GetComponentInParent<EnemyAIController>();
+        enemyTransform = enemyAIController != null ? enemyAIController.transform : transform.root;
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        if(!collision.gameObject.CompareTag("Player")) return;
-        collision.gameObject.GetComponent<PlayerDamageHeadler>().KnockBackReceiver(KnockbackForce,KnockbackDuration,transform);
+        if (!collision.gameObject.CompareTag("Player")) return;
+
+        PlayerDamageHeadler damageHandler = collision.gameObject.GetComponent<PlayerDamageHeadler>();
+        if (damageHandler == null) return;
+
+        damageHandler.KnockBackReceiver(KnockbackForce, KnockbackDuration, enemyTransform);
     }
 }

@@ -1,6 +1,6 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Collections;
 
 public class PlayerHitbox : MonoBehaviour
 {
@@ -8,16 +8,42 @@ public class PlayerHitbox : MonoBehaviour
     private InputAction attack;
     private InputSystem_Actions playerController;
 
+    private AudioSource audioSource;
+
+    [Header("Explosion")]
+    [SerializeField] private GameObject bigExplosionPrefab;
+    [SerializeField] private Transform explosionSpawnPoint;
+
+    [Header("Combat")]
     [SerializeField] private float stunDuration = 1f;
-    private float hitboxActiveDuration = 0.2f;
+    [SerializeField] private float hitboxActiveDuration = 0.2f;
     [SerializeField] private float attackCooldown = 2f;
 
+    private Transform playerRoot;
     private float nextAttackTime;
 
     void Awake()
     {
         col = GetComponent<Collider2D>();
         playerController = new InputSystem_Actions();
+
+        PlayerController owner = GetComponentInParent<PlayerController>();
+        audioSource = GetComponent<AudioSource>();
+        playerRoot = owner != null ? owner.transform : transform.root;
+
+        if (explosionSpawnPoint == null)
+        {
+            explosionSpawnPoint = FindSpawnPoint(playerRoot);
+        }
+
+        if (bigExplosionPrefab == null)
+        {
+            ParticleSystem fallbackEffect = GetComponentInChildren<ParticleSystem>(true);
+            if (fallbackEffect != null)
+            {
+                bigExplosionPrefab = fallbackEffect.gameObject;
+            }
+        }
     }
 
     void Start()
@@ -33,7 +59,10 @@ public class PlayerHitbox : MonoBehaviour
 
     void OnDisable()
     {
-        attack.Disable();
+        if (attack != null)
+        {
+            attack.Disable();
+        }
     }
 
     void Update()
@@ -49,6 +78,8 @@ public class PlayerHitbox : MonoBehaviour
         }
 
         nextAttackTime = Time.time + attackCooldown;
+        SpawnBigExplosion();
+        audioSource.Play();
         StartCoroutine(EnableHitbox(hitboxActiveDuration));
     }
 
@@ -68,5 +99,65 @@ public class PlayerHitbox : MonoBehaviour
 
         Debug.Log("Hit Enemy");
         other.gameObject.GetComponent<EnemyDamageHeadler>().StunReceiver(stunDuration);
+    }
+
+    private void SpawnBigExplosion()
+    {
+        if (bigExplosionPrefab == null)
+        {
+            return;
+        }
+
+        Transform spawn = explosionSpawnPoint != null ? explosionSpawnPoint : transform;
+        GameObject spawned = Instantiate(bigExplosionPrefab, spawn.position, spawn.rotation);
+
+        ParticleSystem[] systems = spawned.GetComponentsInChildren<ParticleSystem>(true);
+        float longestLifetime = 0f;
+
+        for (int i = 0; i < systems.Length; i++)
+        {
+            ParticleSystem ps = systems[i];
+            ps.Play();
+
+            float lifetime = ps.main.duration + ps.main.startLifetime.constantMax;
+            if (lifetime > longestLifetime)
+            {
+                longestLifetime = lifetime;
+            }
+        }
+
+        Destroy(spawned, longestLifetime > 0f ? longestLifetime + 0.25f : 2f);
+    }
+
+    private Transform FindSpawnPoint(Transform root)
+    {
+        if (root == null)
+        {
+            return transform;
+        }
+
+        string[] pointNames =
+        {
+            "ExplosionPoint",
+            "BigExploPoint",
+            "FirePoint",
+            "ShootPoint",
+            "ShotPoint",
+            "Muzzle"
+        };
+
+        Transform[] allTransforms = root.GetComponentsInChildren<Transform>(true);
+        for (int i = 0; i < pointNames.Length; i++)
+        {
+            for (int j = 0; j < allTransforms.Length; j++)
+            {
+                if (allTransforms[j].name == pointNames[i])
+                {
+                    return allTransforms[j];
+                }
+            }
+        }
+
+        return transform;
     }
 }
