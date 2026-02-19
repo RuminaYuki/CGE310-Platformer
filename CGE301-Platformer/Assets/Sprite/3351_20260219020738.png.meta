@@ -376,7 +376,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 3351_20260219020738_9
+      name: wing
       rect:
         serializedVersion: 2
         x: 883
@@ -533,9 +533,9 @@ TextureImporter:
       3351_20260219020738_5: 1916490518
       3351_20260219020738_6: -1188845649
       3351_20260219020738_7: -240881090
-      3351_20260219020738_9: 355428954
       Dash: 379644129
       DashShotGun: 653483331
+      wing: 355428954
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

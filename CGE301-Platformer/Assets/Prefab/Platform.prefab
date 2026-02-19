@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3869133593643694786}
   - component: {fileID: 2812955566962476008}
   - component: {fileID: 229329249211869361}
-  m_Layer: 3
+  m_Layer: 8
   m_Name: Platform
   m_TagString: OneWayPlatform
   m_Icon: {fileID: 0}

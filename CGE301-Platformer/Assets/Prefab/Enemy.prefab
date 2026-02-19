@@ -96,7 +96,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 121694592657237613}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -280,7 +280,7 @@ MonoBehaviour:
   moveSpeed: 1
   groundLayer:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 264
   groundCheckFront: {fileID: 44194083643421438}
   raycastDistance: 0.3
   alertDuration: 0.25
