@@ -19,6 +19,7 @@ public class EnemyStunState : EnemyState
     public override void Enter()
     {
         enemyAi.StopMove();
+        enemyAi.SetStunAnimation(true);
     }
 
     public override void Tick()
@@ -32,5 +33,6 @@ public class EnemyStunState : EnemyState
 
     public override void Exit()
     {
+        enemyAi.SetStunAnimation(false);
     }
 }

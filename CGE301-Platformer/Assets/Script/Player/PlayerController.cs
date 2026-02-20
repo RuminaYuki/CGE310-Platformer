@@ -30,6 +30,7 @@ public class PlayerController : MonoBehaviour
     float dashTimer;
     float nextDashTime;
     int dashDirection = 1;
+    bool hasAirDashed;
 
     [Header("Ground Check")]
     [SerializeField] GroundCheck groundCheck;
@@ -126,7 +127,17 @@ public class PlayerController : MonoBehaviour
 
     void QueueDash()
     {
+        if (isGrounded)
+        {
+            hasAirDashed = false;
+        }
+
         if (dash == null || !dash.WasPressedThisFrame())
+        {
+            return;
+        }
+
+        if (!isGrounded && hasAirDashed)
         {
             return;
         }
@@ -149,6 +160,11 @@ public class PlayerController : MonoBehaviour
         isDashing = true;
         dashTimer = dashDuration;
         nextDashTime = Time.time + dashCooldown;
+
+        if (!isGrounded)
+        {
+            hasAirDashed = true;
+        }
     }
 
     void Walk()
@@ -249,3 +265,4 @@ public class PlayerController : MonoBehaviour
         Gizmos.DrawLine(origin3, end);
     }
 }
+

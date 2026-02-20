@@ -11,6 +11,11 @@ public class EnemyDamageHeadler : MonoBehaviour
 
     public void StunReceiver(float duration)
     {
+        if (enemyAI == null)
+        {
+            return;
+        }
+
         EnemyStunState stunState = enemyAI.StunState as EnemyStunState;
         if (stunState == null)
         {

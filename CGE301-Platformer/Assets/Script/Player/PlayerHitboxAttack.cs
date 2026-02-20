@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,9 +19,12 @@ public class PlayerHitbox : MonoBehaviour
     [SerializeField] private float stunDuration = 1f;
     [SerializeField] private float hitboxActiveDuration = 0.2f;
     [SerializeField] private float attackCooldown = 2f;
+    [SerializeField] private AudioClip missStateClip;
 
     private Transform playerRoot;
     private float nextAttackTime;
+    private readonly HashSet<EnemyAIController> processedEnemiesThisAttack = new HashSet<EnemyAIController>();
+    private bool missSoundPlayedThisAttack;
 
     void Awake()
     {
@@ -67,6 +71,11 @@ public class PlayerHitbox : MonoBehaviour
 
     void Update()
     {
+        if (attack == null)
+        {
+            return;
+        }
+
         if (!attack.WasPressedThisFrame())
         {
             return;
@@ -85,20 +94,63 @@ public class PlayerHitbox : MonoBehaviour
 
     IEnumerator EnableHitbox(float duration)
     {
+        processedEnemiesThisAttack.Clear();
+        missSoundPlayedThisAttack = false;
         col.enabled = true;
         yield return new WaitForSeconds(duration);
         col.enabled = false;
+        processedEnemiesThisAttack.Clear();
+        missSoundPlayedThisAttack = false;
     }
 
     void OnTriggerEnter2D(Collider2D other)
+    {
+        TryStunEnemy(other);
+    }
+
+    void OnTriggerStay2D(Collider2D other)
+    {
+        TryStunEnemy(other);
+    }
+
+    private void TryStunEnemy(Collider2D other)
     {
         if (!other.CompareTag("Enemy"))
         {
             return;
         }
 
+        EnemyAIController enemyAI = other.GetComponentInParent<EnemyAIController>();
+        if (enemyAI == null)
+        {
+            return;
+        }
+
+        if (processedEnemiesThisAttack.Contains(enemyAI))
+        {
+            return;
+        }
+
+        if (!enemyAI.IsInAttackState)
+        {
+            if (!missSoundPlayedThisAttack && missStateClip != null && audioSource != null)
+            {
+                audioSource.Stop();
+                audioSource.PlayOneShot(missStateClip);
+                missSoundPlayedThisAttack = true;
+            }
+            return;
+        }
+
         Debug.Log("Hit Enemy");
-        other.gameObject.GetComponent<EnemyDamageHeadler>().StunReceiver(stunDuration);
+        EnemyDamageHeadler enemyDamageHandler = other.GetComponentInParent<EnemyDamageHeadler>();
+        if (enemyDamageHandler == null)
+        {
+            return;
+        }
+
+        enemyDamageHandler.StunReceiver(stunDuration);
+        processedEnemiesThisAttack.Add(enemyAI);
     }
 
     private void SpawnBigExplosion()

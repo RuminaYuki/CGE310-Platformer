@@ -1885,30 +1885,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 4409737505214755023, guid: 600aa4dc12784114986d778e8861476a, type: 3}
-      propertyPath: m_SortingLayer
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4409737505214755023, guid: 600aa4dc12784114986d778e8861476a, type: 3}
-      propertyPath: m_SortingOrder
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4409737505214755023, guid: 600aa4dc12784114986d778e8861476a, type: 3}
-      propertyPath: m_SortingLayerID
-      value: 1370823735
-      objectReference: {fileID: 0}
-    - target: {fileID: 5265356831629723831, guid: 600aa4dc12784114986d778e8861476a, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 2.27
-      objectReference: {fileID: 0}
-    - target: {fileID: 7815540876828241981, guid: 600aa4dc12784114986d778e8861476a, type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 9100000, guid: 09cda7eacd9d9754dba97f7c47c3c151, type: 2}
-    - target: {fileID: 8406047494686224742, guid: 600aa4dc12784114986d778e8861476a, type: 3}
-      propertyPath: groundLayer.m_Bits
-      value: 264
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

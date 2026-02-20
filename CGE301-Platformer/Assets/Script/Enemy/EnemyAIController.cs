@@ -20,6 +20,7 @@ public class EnemyAIController : EnemyController
     [SerializeField] private float attackRange = 1.2f;
     [SerializeField] private float attackInterval = 1f;
     [SerializeField] private int attackDamage = 1;
+    [SerializeField] private string stunBoolName = "Stun";
 
     [Header("Line Of View")]
     [SerializeField] private Transform viewPoint;
@@ -62,7 +63,8 @@ public class EnemyAIController : EnemyController
     public EnemyState AlertState => alertState;
     public EnemyState AttackState => attackState;
     public EnemyState StunState => stunState;
-    
+    public bool IsInAttackState => stateMachine != null && stateMachine.CurrentState == attackState;
+
     public float AlertDuration => alertDuration;
 
     public Transform Player
@@ -86,6 +88,7 @@ public class EnemyAIController : EnemyController
     {
         SetFacing(patrolDirection);
         rb.linearVelocity = new Vector2(patrolDirection * moveSpeed, rb.linearVelocity.y);
+        SetXVelocity();
     }
 
     public void ReversePatrolDirection()
@@ -159,6 +162,7 @@ public class EnemyAIController : EnemyController
         }
 
         rb.linearVelocity = new Vector2(direction * moveSpeed, rb.linearVelocity.y);
+        SetXVelocity();
     }
 
     public void TryAttackPlayer()
@@ -174,12 +178,32 @@ public class EnemyAIController : EnemyController
 
         nextAttackTime = Time.time + attackInterval;
         animator.SetTrigger("Attack");
-        Debug.Log("Attacked Trigger");
+    }
+
+    public void SetStunAnimation(bool isStunned)
+    {
+        if (animator == null || string.IsNullOrEmpty(stunBoolName))
+        {
+            return;
+        }
+
+        animator.SetBool(stunBoolName, isStunned);
     }
 
     public void StopMove()
     {
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        SetXVelocity();
+    }
+
+    public void SetXVelocity()
+    {
+        if (animator == null)
+        {
+            return;
+        }
+
+        animator.SetFloat("xVelocity", Mathf.Abs(rb.linearVelocity.x));
     }
 
     private void OnDrawGizmosSelected()
@@ -217,4 +241,3 @@ public class EnemyAIController : EnemyController
     }
 
 }
-

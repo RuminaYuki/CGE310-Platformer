@@ -13,9 +13,6 @@ AnimatorStateMachine:
     m_State: {fileID: 8479832381505998487}
     m_Position: {x: 270, y: 110, z: 0}
   - serializedVersion: 1
-    m_State: {fileID: 4350094669661200099}
-    m_Position: {x: 770, y: 180, z: 0}
-  - serializedVersion: 1
     m_State: {fileID: -8465034139380750329}
     m_Position: {x: 510, y: 110, z: 0}
   - serializedVersion: 1
@@ -90,37 +87,6 @@ AnimatorState:
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
---- !u!206 &-6500431703518149980
-BlendTree:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Blend Tree
-  m_Childs:
-  - serializedVersion: 2
-    m_Motion: {fileID: 7400000, guid: e38928031026efa4996ff320d9de5fec, type: 2}
-    m_Threshold: -1
-    m_Position: {x: 0, y: 0}
-    m_TimeScale: 1
-    m_CycleOffset: 0
-    m_DirectBlendParameter: xVelocity
-    m_Mirror: 0
-  - serializedVersion: 2
-    m_Motion: {fileID: 7400000, guid: 80510c6ae925b9d4997bff24b342a13d, type: 2}
-    m_Threshold: 0
-    m_Position: {x: 0, y: 0}
-    m_TimeScale: 1
-    m_CycleOffset: 0
-    m_DirectBlendParameter: xVelocity
-    m_Mirror: 0
-  m_BlendParameter: yVelocity
-  m_BlendParameterY: xVelocity
-  m_MinThreshold: -1
-  m_MaxThreshold: 0
-  m_UseAutomaticThresholds: 0
-  m_NormalizedBlendValues: 0
-  m_BlendType: 0
 --- !u!1101 &-6466101361188567069
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -309,32 +275,6 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
---- !u!1102 &4350094669661200099
-AnimatorState:
-  serializedVersion: 6
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Jumping
-  m_Speed: 1
-  m_CycleOffset: 0
-  m_Transitions: []
-  m_StateMachineBehaviours: []
-  m_Position: {x: 50, y: 50, z: 0}
-  m_IKOnFeet: 0
-  m_WriteDefaultValues: 1
-  m_Mirror: 0
-  m_SpeedParameterActive: 0
-  m_MirrorParameterActive: 0
-  m_CycleOffsetParameterActive: 0
-  m_TimeParameterActive: 0
-  m_Motion: {fileID: -6500431703518149980}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
 --- !u!1101 &4443995614554375868
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
