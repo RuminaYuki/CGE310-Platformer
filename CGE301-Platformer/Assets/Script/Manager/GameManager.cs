@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Reflection;
 
 public enum GameState
 {
@@ -23,8 +24,13 @@ public class GameManager : MonoBehaviour
     [Header("Enable Plyaer")]
     [SerializeField] private PlayerController playerController;
 
-    [Header("Debug")]
-    [SerializeField] private bool showGUI = true;
+    [Header("UI State Objects")]
+    [SerializeField] private Transform uiRoot;
+    [SerializeField] private GameObject startUI;
+    [SerializeField] private GameObject playingUI;
+    [SerializeField] private GameObject winUI;
+    [SerializeField] private GameObject playingTimeUI;
+    [SerializeField] private GameObject winTimeUI;
 
     private void Awake()
     {
@@ -36,6 +42,7 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         Time.timeScale = 1f;
+        CacheUIReferences();
     }
 
     private void Start()
@@ -68,15 +75,13 @@ public class GameManager : MonoBehaviour
         if (currentState == GameState.Playing)
         {
             timePlayed += Time.deltaTime;
+            UpdateTimeLabels();
             return;
         }
 
         if (currentState == GameState.Win)
         {
-            if (PressedStart())
-            {
-                GoToMenu();
-            }
+            UpdateTimeLabels();
         }
     }
 
@@ -140,11 +145,13 @@ public class GameManager : MonoBehaviour
     private void ResetRun()
     {
         timePlayed = 0f;
+        UpdateTimeLabels();
     }
 
     private void SetState(GameState newState)
     {
         currentState = newState;
+        UpdateUIByState();
         Debug.Log("STATE = " + currentState);
     }
 
@@ -154,49 +161,110 @@ public class GameManager : MonoBehaviour
         Win();
     }
 
-    private void OnGUI()
-    {
-        if (!showGUI) return;
-
-        float w = Screen.width;
-        float h = Screen.height;
-
-        GUIStyle center = new GUIStyle(GUI.skin.label)
-        {
-            fontSize = Mathf.RoundToInt(Mathf.Min(w, h) * 0.05f),
-            alignment = TextAnchor.MiddleCenter
-        };
-
-        GUIStyle hud = new GUIStyle(GUI.skin.label)
-        {
-            fontSize = Mathf.RoundToInt(Mathf.Min(w, h) * 0.035f),
-            alignment = TextAnchor.UpperLeft
-        };
-
-        if (currentState == GameState.Menu)
-        {
-            GUI.Label(new Rect(0, h * 0.42f, w, 80), "Tap to Play", center);
-        }
-
-        if (currentState == GameState.Playing)
-        {
-            GUI.Label(new Rect(20, 20, w * 0.7f, 40), "Time: " + FormatTime(timePlayed), hud);
-            GUI.Label(new Rect(20, 60, w * 0.9f, 40), "Goal: Collect the item!", hud);
-        }
-
-        if (currentState == GameState.Win)
-        {
-            GUI.Label(new Rect(0, h * 0.4f, w, 80), "YOU WIN!", center);
-            GUI.Label(new Rect(0, h * 0.5f, w, 60), "Time: " + FormatTime(timePlayed), center);
-            GUI.Label(new Rect(0, h * 0.6f, w, 60), "Tap to return to Menu", center);
-        }
-    }
-
     private string FormatTime(float t)
     {
         int sec = Mathf.Max(0, Mathf.FloorToInt(t));
         int m = sec / 60;
         int s = sec % 60;
         return $"{m}:{s:00}";
+    }
+
+    private void CacheUIReferences()
+    {
+        if (uiRoot == null)
+        {
+            GameObject root = GameObject.Find("UI");
+            if (root != null)
+            {
+                uiRoot = root.transform;
+            }
+        }
+
+        if (uiRoot == null)
+        {
+            return;
+        }
+
+        if (startUI == null)
+        {
+            Transform t = uiRoot.Find("Start");
+            if (t != null) startUI = t.gameObject;
+        }
+
+        if (playingUI == null)
+        {
+            Transform t = uiRoot.Find("Playing");
+            if (t != null) playingUI = t.gameObject;
+        }
+
+        if (winUI == null)
+        {
+            Transform t = uiRoot.Find("Win");
+            if (t != null) winUI = t.gameObject;
+        }
+
+        if (playingTimeUI == null && playingUI != null)
+        {
+            Transform t = playingUI.transform.Find("Time");
+            if (t != null) playingTimeUI = t.gameObject;
+        }
+
+        if (winTimeUI == null && winUI != null)
+        {
+            Transform t = winUI.transform.Find("Time");
+            if (t != null) winTimeUI = t.gameObject;
+        }
+    }
+
+    private void UpdateUIByState()
+    {
+        if (!HasSceneUI())
+        {
+            return;
+        }
+
+        if (startUI != null) startUI.SetActive(currentState == GameState.Menu);
+        if (playingUI != null) playingUI.SetActive(currentState == GameState.Playing);
+        if (winUI != null) winUI.SetActive(currentState == GameState.Win);
+        UpdateTimeLabels();
+    }
+
+    private bool HasSceneUI()
+    {
+        return startUI != null || playingUI != null || winUI != null;
+    }
+
+    private void UpdateTimeLabels()
+    {
+        string timeValue = "Time: " + FormatTime(timePlayed);
+        SetTextOnObject(playingTimeUI, timeValue);
+        SetTextOnObject(winTimeUI, timeValue);
+    }
+
+    private void SetTextOnObject(GameObject target, string value)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        Component[] components = target.GetComponents<Component>();
+        for (int i = 0; i < components.Length; i++)
+        {
+            Component component = components[i];
+            if (component == null)
+            {
+                continue;
+            }
+
+            PropertyInfo textProperty = component.GetType().GetProperty("text");
+            if (textProperty == null || !textProperty.CanWrite || textProperty.PropertyType != typeof(string))
+            {
+                continue;
+            }
+
+            textProperty.SetValue(component, value);
+            return;
+        }
     }
 }
